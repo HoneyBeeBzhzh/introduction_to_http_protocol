@@ -1,8 +1,10 @@
-# Введение в протокол HTTP: Теория
+# Введение в протокол HTTP
 
 Этот документ содержит теоретические основы протокола HTTP, подготовленные для студентов первого курса (ИБ, КБ, ИБАС). Материал объясняет базовые понятия доступным языком и включает схемы для наглядности.
 
 ---
+
+# Теоритическая часть
 
 ## 1. Что такое HTTP и зачем он нужен
 
@@ -220,6 +222,205 @@ X-Powered-By: PHP/7.4.3
 
 **Протокол HTTP — это фундаментальная технология, обеспечивающая работу современных веб-приложений. Понимание его структуры, включая запросы, ответы, методы, заголовки и коды состояния, необходимо для студентов, изучающих сетевые технологии. HTTPS добавляет уровень безопасности, что делает его стандартом для защиты данных в Интернете.**
 
+---
+
 # Практическая часть
-???
+
+## Задание 1: User-Agent
+### Описание
+**Некоторые страницы доступны только Супер Секретным Браузерам...**
+Попробуйте получить доступ к `/secret.html`
+
+### Решение
+**Решение через curl:**
+```bash
+curl -A "SuperSecretBrowser" http://localhost:8080/secret.html
+```
+
+**Решение через telnet:**
+```bash
+telnet localhost 8080
+GET /secret.html HTTP/1.1
+Host: localhost
+User-Agent: SuperSecretBrowser
+```
+
+---
+
+## Задание 2: Cookie Monster
+### Описание
+**Админка защищена, но у каждого админа есть свои cookie...**
+Начните с `/login.html`
+
+### Решение
+**Решение через curl:**
+```bash
+curl -b "admin=true" http://localhost:8080/admin.html
+```
+
+**Решение через telnet:**
+```bash
+telnet localhost 8080
+GET /admin.html HTTP/1.1
+Host: localhost
+Cookie: admin=true
+```
+
+---
+
+## Задание 3: Method Challenge
+### Описание
+**Сервер ожидает, что вы знаете, как правильно "попросить" его дать ответ...**
+Попробуйте отправить запрос на `/method_challenge`
+
+#### Подсказка
+**Сервер очень любит порядок. Он хочет знать, сколько всего заданий в этом CTF. (Amount-Tasks)**
+
+### Решение
+**Решение через curl:**
+```bash
+curl -X POST -H "X-Amount-Tasks: 8" http://localhost:8080/method_challenge
+```
+
+**Решение через telnet:**
+```bash
+telnet localhost 8080
+POST /method_challenge HTTP/1.1
+Host: localhost
+X-Amount-Tasks: 8
+```
+
+---
+
+## Задание 4: HTTP Status
+### Описание
+**Изучите ответы сервера на разных путях**
+- `/moved` - куда ведет редирект?
+- `/forbidden` - почему нельзя?
+- `/notfound` - что потеряли?
+- `/error` - что сломалось?
+
+### Решение
+**Решение через curl:**
+```bash
+curl -I http://localhost:8080/moved
+curl -I http://localhost:8080/forbidden
+curl -I http://localhost:8080/notfound
+curl -I http://localhost:8080/error
+```
+
+**Решение через telnet:**
+```bash
+telnet localhost 8080
+HEAD /moved HTTP/1.1
+Host: localhost
+
+HEAD /forbidden HTTP/1.1
+Host: localhost
+
+HEAD /notfound HTTP/1.1
+Host: localhost
+
+HEAD /error HTTP/1.1
+Host: localhost
+```
+
+---
+
+## Задание 5: Ultimate Challenge
+### Описание
+**Только настоящие HTTP-мастера смогут пройти это испытание...**
+Начните с `/ultimate`, но помните - вежливость открывает многие двери!
+
+### /ultimate
+Говорят, где-то на сервере спрятан секретный endpoint `/challenge`...
+
+- GET-запросы он не принимает
+- Нужен специальный токен
+- И не забудьте быть вежливым!
+
+**DEBUG INFO: - Method: PUT - Required header: X-Secret-Token - Don't forget to say the magic word**
+
+### Решение
+**Решение через curl:**
+```bash
+curl -H "X-Secret-Token: s3cr3t" -H "X-Magic-Word: please" http://localhost:8080/challenge.html
+```
+
+**Решение через telnet:**
+```bash
+telnet localhost 8080
+GET /challenge.html HTTP/1.1
+Host: localhost
+X-Secret-Token: s3cr3t
+X-Magic-Word: please
+```
+
+---
+
+## Задание 6: JSON Master
+### Описание
+**API любит JSON и ничего кроме JSON...**
+Попробуйте получить данные от `/api/data`
+
+### Решение
+**Решение через curl:**
+```bash
+curl -H "Content-Type: application/json" http://localhost:8080/api/data
+```
+
+**Решение через telnet:**
+```bash
+telnet localhost 8080
+GET /api/data HTTP/1.1
+Host: localhost
+Content-Type: application/json
+```
+
+---
+
+## Задание 7: Query Challenge
+### Описание
+**Сервер ожидает, что вы знаете, как правильно "спросить" его...**
+Попробуйте отправить запрос на `/query_challenge`
+
+#### Подсказка
+**Сервер очень внимателен к деталям. Он не ответит, если вы не укажете "корректный ключ" в запросе.**
+
+### Решение
+**Решение через curl:**
+```bash
+curl --get --data-urlencode "key=correct_key" "http://localhost:8080/query_challenge"
+```
+
+**Решение через telnet:**
+```bash
+telnet localhost 8080
+POST /query_challenge?key=correct_key HTTP/1.1
+Host: localhost
+```
+
+---
+
+## Задание 8: Reverse Proxy Challenge
+### Описание
+**Сервер ожидает запрос через обратный прокси...**
+Попробуйте получить доступ к `/proxy_challenge` через обратный прокси
+
+#### Подсказка
+**Флаг придет в заголовке, который обычно используется для передачи IP-адреса клиента**
+
+### Решение
+**Решение через curl:**
+```bash
+curl -H "X-Forwarded-For: 127.0.0.1" http://localhost:8080/proxy_challenge
+```
+
+**Решение через telnet:**
+```bash
+telnet localhost 8080
+GET /proxy_challenge HTTP/1.1
+Host: localhost
+X-Forwarded-For: 127.0.0.1
+```
  
